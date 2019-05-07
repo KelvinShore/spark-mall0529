@@ -19,24 +19,24 @@ object RandomOptions {
 
   def main(args: Array[String]): Unit = {
     val randomName = RandomOptions(RanOpt("zhangchen",10),RanOpt("li4",30))
-    for (i <- 1 to 8 ) {
+    for (i <- 1 to 40 ) {
       println(i+":"+randomName.getRandomOpt())
 
     }
   }
 
-
 }
-
-
-case class RanOpt[T](value:T,weight:Int){
-}
-class RandomOptions[T](opts:RanOpt[T]*) {
-  var totalWeight=0
-  var optsBuffer  =new ListBuffer[T]
-
-  def getRandomOpt(): T ={
-    val randomNum= new Random().nextInt(totalWeight)
-    optsBuffer(randomNum)
+  case class RanOpt[T](value:T,weight:Int){
   }
-}
+  class RandomOptions[T](opts:RanOpt[T]*) {
+    var totalWeight=0
+    var optsBuffer  =new ListBuffer[T]
+
+    def getRandomOpt(): T ={
+      val randomNum= new Random().nextInt(totalWeight)
+      optsBuffer(randomNum)
+    }
+  }
+
+
+
