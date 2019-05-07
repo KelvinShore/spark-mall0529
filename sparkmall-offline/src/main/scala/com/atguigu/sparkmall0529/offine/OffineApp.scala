@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat
 import java.util.{Date, UUID}
 
 import com.alibaba.fastjson.{JSON, JSONObject}
-import com.atguigu.sparkmall0529.offine.app.SessionStatApp
+import com.atguigu.sparkmall0529.offine.app.{CategoryTop10App, SessionExtractorApp, SessionStatApp}
 import org.apache.commons.configuration2.FileBasedConfiguration
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, sql}
@@ -44,17 +44,22 @@ object OffineApp {
     userActionRDD.cache()
 
     //2 以session为key 进行聚合 =>> RDD[session,Iterable[UserVisitAction]]
-    val sessionActionRDD: RDD[(String, Iterable[UserVisitAction])] = userActionRDD.map(userAction => {
+    val sessionActionsRDD: RDD[(String, Iterable[UserVisitAction])] = userActionRDD.map(userAction => {
       (userAction.session_id, userAction)
     }).groupByKey()
 
     //需求一:统计出符合筛选条件的session中  访问时长在小于10s  10s以上各个范围内的session数量占比.访问步长小于等于5  和大于等于5次的占比
-    SessionStatApp.statSession(sessionActionRDD,sparkSession,taskId,conditionJsonString)
+    SessionStatApp.statSession(sessionActionsRDD,sparkSession,taskId,conditionJsonString)
     println("需要一 完成!!")
 
     //需求二  按每小时session数量比例随机抽取1000个session
+    sessionActionsRDD.count()
+    SessionExtractorApp.extractSession(sessionActionsRDD, sparkSession, taskId)
+    println("需求二 完成!!")
 
-
+    //需求三
+    CategoryTop10App.statCategoryTop10(userActionRDD,sparkSession,taskId)
+    println("需求三 完成！")
 
 
   }
