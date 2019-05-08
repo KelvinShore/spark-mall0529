@@ -13,7 +13,7 @@ import scala.collection.mutable
   * Created by kelvin on 2019/5/7.
   */
 object CategoryTop10App {
-  def statCategoryTop10(userActionRDD: RDD[UserVisitAction] ,sparkSession: SparkSession,taskId:String): Unit ={
+  def statCategoryTop10(userActionRDD: RDD[UserVisitAction] ,sparkSession: SparkSession,taskId:String) ={
     //      1	遍历全部日志，根据品类id和操作类型，进行累加。（累加器）
     //      1．1定义累加器   map结构 ，key:  cid_click,  cid_order,cid_pay      value：count
     val categoryCountAccumulator = new CategoryCountAccumulator()
@@ -71,6 +71,9 @@ object CategoryTop10App {
     }
     //8 结果保存到数据库
     JdbcUtil.executeBatchUpdate("insert into category_top10 values (?,?,?,?,?)",top10CategoryParam)
+    //9 给 需求四用
+    top10CategoryList
+
   }
 }
 

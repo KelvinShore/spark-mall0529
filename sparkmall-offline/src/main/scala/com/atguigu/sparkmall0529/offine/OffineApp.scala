@@ -7,7 +7,8 @@ import java.text.SimpleDateFormat
 import java.util.{Date, UUID}
 
 import com.alibaba.fastjson.{JSON, JSONObject}
-import com.atguigu.sparkmall0529.offine.app.{CategoryTop10App, SessionExtractorApp, SessionStatApp}
+import com.atguigu.sparkmall0529.offine.app._
+import com.atguigu.sparkmall0529.offine.bean.CategoryCountInfo
 import org.apache.commons.configuration2.FileBasedConfiguration
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, sql}
@@ -57,10 +58,21 @@ object OffineApp {
     SessionExtractorApp.extractSession(sessionActionsRDD, sparkSession, taskId)
     println("需求二 完成!!")
 
-    //需求三
-    CategoryTop10App.statCategoryTop10(userActionRDD,sparkSession,taskId)
+    //需求三  获取点击 下单和支付数量排名前10的品类
+    val categoryTop10: List[CategoryCountInfo] = CategoryTop10App.statCategoryTop10(userActionRDD,sparkSession,taskId)
     println("需求三 完成！")
 
+    // 需求四  Top10热门品类中  Top10 活跃Session统计
+    CategorySessionApp.statCategoryTop10Session(categoryTop10,userActionRDD,sparkSession,taskId)
+    println("需求四 完成!")
+
+    // 需求五  页面单跳转化率统计
+    PageConvertRateApp.calcPageConvertRate(userActionRDD,sparkSession,taskId,conditionJsonObj)
+    println("需求五 完成!")
+
+    // 需求六  每天各地区各城市各广告的点击流量实时统计
+    AreaTop3ClickCountApp.statAreaTop3ClickCount(sparkSession)
+    println("需求六 完成")
 
   }
 
